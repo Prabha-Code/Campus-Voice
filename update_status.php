@@ -1,15 +1,19 @@
 <?php
-include "db.php"; // Database connection
+include 'db.php'; // Database connection
 
-if (isset($_POST['complaint_id']) && isset($_POST['status'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['complaint_id']) && isset($_POST['status'])) {
     $complaint_id = $_POST['complaint_id'];
-    $new_status = $_POST['status'];
+    $status = $_POST['status'];
 
-    $update_query = "UPDATE complaints SET status='$new_status' WHERE id='$complaint_id'";
-    if (mysqli_query($conn, $update_query)) {
-        echo "success";
+    $stmt = $conn->prepare("UPDATE complaints SET status=? WHERE complaint_id=?");
+    $stmt->bind_param("ss", $status, $complaint_id);
+
+    if ($stmt->execute()) {
+        echo "Success";
     } else {
-        echo "error";
+        echo "Error: " . $conn->error;
     }
+    $stmt->close();
+    $conn->close();
 }
 ?>
